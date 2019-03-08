@@ -4,6 +4,8 @@ resource "google_compute_instance" "vm_shopfront" {
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
 
+  tags = ["web"]
+
   boot_disk {
     initialize_params {
       image = "${var.instance_image}"
@@ -42,7 +44,8 @@ resource "google_compute_instance" "vm_shopfront" {
 
     inline = [
         "chmod +x ${var.install_script_dest_path}",
-        "echo \"${google_compute_instance.vm_productcatalogue.0.network_interface.0.access_config.0.nat_ip}\" >> productcatalogue_ip.txt",
+        "echo \"productManagerUri=http://\"${google_compute_instance.vm_productcatalogue.0.network_interface.0.access_config.0.nat_ip}\"\" >> application.properties",
+        "echo \"stockManagerUri=http://\"${google_compute_instance.vm_stockmanager.0.network_interface.0.access_config.0.nat_ip}\"\" >> application.properties",
         "sudo ${var.install_script_dest_path} ${count.index}",
     ]
   }
@@ -57,6 +60,8 @@ resource "google_compute_instance" "vm_productcatalogue" {
   name = "productcatalogue-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
+
+  tags = ["web"]
 
   boot_disk {
     initialize_params {
@@ -110,6 +115,8 @@ resource "google_compute_instance" "vm_stockmanager" {
   name = "stockmanager-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
+
+  tags = ["web"]
 
   boot_disk {
     initialize_params {
