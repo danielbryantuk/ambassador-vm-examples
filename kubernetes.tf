@@ -24,12 +24,3 @@ resource "google_container_cluster" "primary" {
     update = "40m"
   }
 }
-
-
-output "k8s_master_ip" {
-  value = "${google_container_cluster.primary.endpoint}"
-}
-
-output "gcloud_get_creds" {
-  value = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --project ${var.project_name} --zone ${var.region_zone}"
-}
