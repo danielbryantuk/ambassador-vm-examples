@@ -1,5 +1,5 @@
-output "pool_public_ip" {
-  value = "${google_compute_forwarding_rule.default.ip_address}"
+output "shop_loadbalancer_ip" {
+  value = "${google_compute_forwarding_rule.shopfront.ip_address}"
 }
 
 output "shopfront_ips" {

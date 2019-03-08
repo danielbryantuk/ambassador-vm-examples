@@ -13,7 +13,7 @@ resource "google_compute_instance" "vm_shopfront" {
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.shop.name}"
     access_config = {
     }
   }
@@ -70,7 +70,7 @@ resource "google_compute_instance" "vm_productcatalogue" {
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.shop.name}"
     access_config = {
     }
   }
@@ -125,7 +125,7 @@ resource "google_compute_instance" "vm_stockmanager" {
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.shop.name}"
     access_config = {
     }
   }
