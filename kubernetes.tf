@@ -4,8 +4,8 @@ resource "google_container_cluster" "primary" {
 
   # Setting an empty username and password explicitly disables basic auth
   master_auth {
-    username = "daniel"
-    password = "wibblewibblewibble"
+    username = ""
+    password = ""
   }
 
   node_config {
