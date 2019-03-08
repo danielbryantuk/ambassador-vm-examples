@@ -57,7 +57,7 @@ resource "google_compute_instance" "vm_shopfront" {
 }
 
 resource "google_compute_instance" "vm_productcatalogue" {
-  count = 2
+  count = 1
   name = "productcatalogue-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
@@ -112,7 +112,7 @@ resource "google_compute_instance" "vm_productcatalogue" {
 }
 
 resource "google_compute_instance" "vm_stockmanager" {
-  count = 2
+  count = 1
   name = "stockmanager-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"

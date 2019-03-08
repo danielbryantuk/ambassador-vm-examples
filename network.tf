@@ -8,7 +8,7 @@ resource "google_compute_firewall" "shop" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "${var.shopfront_port}", "${var.productcatalogue_port}", "${var.stockmanager_port}"]
+    ports    = ["22", "443", "6443", "${var.shopfront_port}", "${var.productcatalogue_port}", "${var.stockmanager_port}"]
   }
 
   source_ranges = ["0.0.0.0/0"]
