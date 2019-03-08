@@ -4,6 +4,8 @@ apt-get update -y
 apt-get upgrade ca-certificates-java -y
 apt-get install openjdk-8-jre-headless -y
 
+cp application.properties /tmp
+
 cd /tmp
 wget https://storage.googleapis.com/oreilly-docker-java-shopping/shopfront-0.0.1-SNAPSHOT.jar -c -O app.jar
 
@@ -11,7 +13,7 @@ apt-get install supervisor -y
 
 cat >> /etc/supervisor/supervisord.conf <<EOL
 [program:executablejar]
-command=java -jar /tmp/app.jar --server.port=80
+command=java -jar /tmp/app.jar --spring.profiles.active=override --spring.config.location=file:/tmp/application-override.properties
 directory=/tmp
 autostart=true
 autorestart=true

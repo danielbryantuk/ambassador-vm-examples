@@ -8,17 +8,16 @@ resource "google_compute_firewall" "shop" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "80", "8020", "8030"]
+    ports    = ["22", "${var.shopfront_port}", "${var.productcatalogue_port}", "${var.stockmanager_port}"]
   }
 
   source_ranges = ["0.0.0.0/0"]
-  # target_tags   = ["web"]
 }
 
 resource "google_compute_http_health_check" "shopfront" {
   name                = "tf-shopfront-basic-check"
   request_path        = "/"
-  port                = "80"
+  port                = "${var.shopfront_port}"
   check_interval_sec  = 1
   healthy_threshold   = 1
   unhealthy_threshold = 10
@@ -34,13 +33,13 @@ resource "google_compute_target_pool" "shopfront" {
 resource "google_compute_forwarding_rule" "shopfront" {
   name       = "tf-shopfront-forwarding-rule"
   target     = "${google_compute_target_pool.shopfront.self_link}"
-  port_range = "80"
+  port_range = "${var.shopfront_port}"
 }
 
 resource "google_compute_http_health_check" "productcatalogue" {
   name                = "tf-productcatalogue-check"
   request_path        = "/products"
-  port                = "8020"
+  port                = "${var.productcatalogue_port}"
   check_interval_sec  = 1
   healthy_threshold   = 1
   unhealthy_threshold = 10
@@ -56,13 +55,13 @@ resource "google_compute_target_pool" "productcatalogue" {
 resource "google_compute_forwarding_rule" "productcatalogue" {
   name       = "tf-productcatalogue-forwarding-rule"
   target     = "${google_compute_target_pool.productcatalogue.self_link}"
-  port_range = "8020"
+  port_range = "${var.productcatalogue_port}"
 }
 
 resource "google_compute_http_health_check" "stockmanager" {
   name                = "tf-stockmanager-basic-check"
   request_path        = "/stocks"
-  port                = "8030"
+  port                = "${var.stockmanager_port}"
   check_interval_sec  = 1
   healthy_threshold   = 1
   unhealthy_threshold = 10
@@ -78,5 +77,5 @@ resource "google_compute_target_pool" "stockmanager" {
 resource "google_compute_forwarding_rule" "stockmanager" {
   name       = "tf-stockmanager-forwarding-rule"
   target     = "${google_compute_target_pool.stockmanager.self_link}"
-  port_range = "8030"
+  port_range = "${var.stockmanager_port}"
 }

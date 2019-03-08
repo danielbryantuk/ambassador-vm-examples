@@ -33,3 +33,15 @@ variable "instance_type" {
 variable "instance_image" {
   default = "ubuntu-os-cloud/ubuntu-1804-lts"
 }
+
+variable "shopfront_port" {
+  default = "80"
+}
+
+variable "productcatalogue_port" {
+  default = "8020"
+}
+
+variable "stockmanager_port" {
+  default = "8030"
+}
