@@ -3,9 +3,9 @@ ambassador-vm-examples
 
 ## Overview
 
- * TODO: Add network/architecture diagram *
+Below is a network diagram of the infrastructure you will be deploying within this tutorial. By default you will deploy three VMs -- one for each of the Java services "shopfront", "productcatalogue", and "stockmanager" -- alongside a GKE hosted Kubernetes cluster. Several load balancers will also be created.
 
-
+![Network diagram](images/network_diagram.jpg)
 
 ## Instructions
 
@@ -77,3 +77,139 @@ First run `terraform plan` in order to check everything is configured correctly,
 ```
 terraform plan
 ```
+
+If you see any errors in the output from the above command, please double-check that you have created your GCP account correctly, and also created the `secret-variables.tf` as specified above.
+
+Next, create the infrastructure by running `terraform apply`. You can remove the need to confirm the creation by adding the `-auto-approve` argument.
+
+```
+terraform apply -auto-approve
+```
+Note: You may occasionally see the following error when provisioning "E: Package 'ca-certificates-java' has no installation candidate", and this can be overcome by running the `terraform apply -auto-approve` again
+
+The creation of the infrastructure may take some time (~5 mins).
+
+Upon successful execution of the command, you will see output similar to this:
+
+```
+Apply complete! Resources: 9 added, 0 changed, 2 destroyed.
+
+Outputs:
+
+gcloud_get_creds = gcloud container clusters get-credentials ambassador-demo --project nodal-flagstaff-XXXX --zone us-central1-f
+shop_loadbalancer_ip_port = 35.192.25.31:80
+shopfront_ambassador_config =
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopfront
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v1
+      kind:  Mapping
+      name:  shopfront_mapping
+      prefix: /shopfront/
+      service: 35.192.25.31:80
+spec:
+  ports:
+  - name: shopfront
+    port: 80
+
+```
+
+You can access the shopfront instance via the load balancer IP and port specified via the `shop_loadbalancer_ip_port` output e.g. http://35.192.25.31:80 in the above example
+
+![Accessing the Shopfront via load balancer](images/shopfront_screenshot.jpg)
+
+### Deploy Ambassador into Kubernetes
+
+Configure your local `kubectl` via the `gcloud` tool, in order to be able to access the ambassador-demo cluster that was just created. The command to run is specified in the `gcloud_get_creds` output variable.
+
+```
+$ gcloud container clusters get-credentials ambassador-demo --project nodal-algebra-232111 --zone us-central1-f
+
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for ambassador-demo.
+
+$ kubectl get svc
+NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.59.240.1   <none>        443/TCP   28m
+```
+
+You can now deploy Ambassador into the cluster using the [Getting Started](https://www.getambassador.io/user-guide/getting-started/) instructructions in the Ambassador docs, or by running the commands below:
+
+```
+# Configure RBAC (enabled by default in GKS) for your account
+$ kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
+
+clusterrolebinding.rbac.authorization.k8s.io/my-cluster-admin-binding created
+
+# Install Ambassador with RBAC support
+$ kubectl apply -f https://getambassador.io/yaml/ambassador/ambassador-rbac.yaml
+
+service/ambassador-admin created
+clusterrole.rbac.authorization.k8s.io/ambassador created
+serviceaccount/ambassador created
+clusterrolebinding.rbac.authorization.k8s.io/ambassador created
+deployment.extensions/ambassador created
+
+$ kubectl get svc
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ambassador-admin   NodePort    10.59.255.240   <none>        8877:30801/TCP   39s
+kubernetes         ClusterIP   10.59.240.1     <none>        443/TCP          32m
+```
+
+Now you can deploy the `ambassador-service.yaml` configuration included in the k8s-config directory, which creates an Ambassador Service that is exposed via an external load balancer.
+
+```
+$ kubectl apply -f k8s-config/ambassador-service.yaml
+service/ambassador created
+
+# Wait several minutes for the Google load balancer to be created and an external IP address assigned
+$ kubectl get svc
+
+kubectl get svc
+NAME               TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)          AGE
+ambassador         LoadBalancer   10.59.243.153   35.222.43.55   80:32186/TCP     1m
+ambassador-admin   NodePort       10.59.255.240   <none>         8877:30801/TCP   3m
+kubernetes         ClusterIP      10.59.240.1     <none>         443/TCP          35m
+```
+
+You can now add an Ambassador Mapping to the shopfront service you accessed earlier. This will allow you to access the shopfront via the Ambassador external IP and Kubernetes, rather than calling the shopfront load balancer directly.
+
+The required Ambassador configuration was included as part of the Terraform apply output, and can be found in the `shopfront_ambassador_config` variable. Copy and paste this output to a new file named `shopfront.yaml` in the k8s-config directory.
+
+For example, this is the output I copy/pasted into a newly created `k8s-config/shopfront.yaml` file.
+```
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopfront
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v1
+      kind:  Mapping
+      name:  shopfront_mapping
+      prefix: /shopfront/
+      service: 35.192.25.31:80
+spec:
+  ports:
+  - name: shopfront
+    port: 80
+```
+
+Apply this config to your Kubernetes cluster:
+
+```
+$ kubectl apply -f k8s-config/shopfront.yaml
+
+service/shopfront created
+```
+
+You can now access the shopfront via the Ambassador IP and mapping specified in the config. e.g. `http://35.222.43.55/shopfront/`
+
+![Accessing the shopfront via Ambassador running in k8s](images/shopfront_screenshot.jpg)
