@@ -16,11 +16,11 @@ output "shop_loadbalancer_ip_port" {
 
 
 # output "k8s_master_ip" {
-#   value = "${google_container_cluster.primary.endpoint}"
+#   value = "${google_container_cluster.ambassador_demo.endpoint}"
 # }
 
 output "gcloud_get_creds" {
-  value = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --project ${var.project_name} --zone ${var.region_zone}"
+  value = "gcloud container clusters get-credentials ${google_container_cluster.ambassador_demo.name} --project ${var.project_id} --zone ${var.region_zone}"
 }
 
 

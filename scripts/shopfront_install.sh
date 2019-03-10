@@ -4,7 +4,9 @@ apt-get update -y
 apt-get upgrade ca-certificates-java -y
 apt-get install openjdk-8-jre-headless -y
 
-cp application.properties /tmp
+# First arg to script is count number of instance
+# Second arg to script is name of spring config file
+cp $2 /tmp/application-override.properties
 
 cd /tmp
 wget https://storage.googleapis.com/oreilly-docker-java-shopping/shopfront-0.0.1-SNAPSHOT.jar -c -O app.jar

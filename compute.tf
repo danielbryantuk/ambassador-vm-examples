@@ -1,10 +1,10 @@
 resource "google_compute_instance" "vm_shopfront" {
-  count = 1
+  count = "${var.shopfront_count}"
   name = "shopfront-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
 
-  tags = ["web"]
+  tags = ["${var.internet_accessible_tag}"]
 
   boot_disk {
     initialize_params {
@@ -44,10 +44,10 @@ resource "google_compute_instance" "vm_shopfront" {
 
     inline = [
         "chmod +x ${var.install_script_dest_path}",
-        "echo \"server.port=${var.shopfront_port}\" >> application.properties",
-        "echo \"productCatalogueUri=http://\"${google_compute_forwarding_rule.productcatalogue.ip_address}:${var.productcatalogue_port}\"\" >> application.properties",
-        "echo \"stockManagerUri=http://\"${google_compute_forwarding_rule.stockmanager.ip_address}:${var.stockmanager_port}\"\" >> application.properties",
-        "sudo ${var.install_script_dest_path} ${count.index}",
+        "echo \"server.port=${var.shopfront_port}\" >> ${var.spring_cfg_filename}",
+        "echo \"productCatalogueUri=http://\"${google_compute_forwarding_rule.productcatalogue.ip_address}:${var.productcatalogue_port}\"\" >> ${var.spring_cfg_filename}",
+        "echo \"stockManagerUri=http://\"${google_compute_forwarding_rule.stockmanager.ip_address}:${var.stockmanager_port}\"\" >> ${var.spring_cfg_filename}",
+        "sudo ${var.install_script_dest_path} ${count.index} ${var.spring_cfg_filename}",
     ]
   }
 
@@ -57,12 +57,12 @@ resource "google_compute_instance" "vm_shopfront" {
 }
 
 resource "google_compute_instance" "vm_productcatalogue" {
-  count = 1
+  count = "${var.productcatalogue_count}"
   name = "productcatalogue-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
 
-  tags = ["web"]
+  tags = ["${var.internet_accessible_tag}"]
 
   boot_disk {
     initialize_params {
@@ -112,12 +112,12 @@ resource "google_compute_instance" "vm_productcatalogue" {
 }
 
 resource "google_compute_instance" "vm_stockmanager" {
-  count = 1
+  count = "${var.stockmanager_count}"
   name = "stockmanager-instance-${count.index}"
   machine_type = "${var.instance_type}"
   zone = "${var.region_zone}"
 
-  tags = ["web"]
+  tags = ["${var.internet_accessible_tag}"]
 
   boot_disk {
     initialize_params {

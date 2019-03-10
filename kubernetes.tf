@@ -1,6 +1,6 @@
-resource "google_container_cluster" "primary" {
+resource "google_container_cluster" "ambassador_demo" {
   name               = "ambassador-demo"
-  initial_node_count = 3
+  initial_node_count = "${var.k8s_node_count}"
 
   # Setting an empty username and password explicitly disables basic auth
   master_auth {

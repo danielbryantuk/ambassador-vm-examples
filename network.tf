@@ -1,5 +1,6 @@
 resource "google_compute_network" "shop" {
   name = "shop"
+  auto_create_subnetworks = "true"
 }
 
 resource "google_compute_firewall" "shop" {
@@ -8,10 +9,10 @@ resource "google_compute_firewall" "shop" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "443", "6443", "${var.shopfront_port}", "${var.productcatalogue_port}", "${var.stockmanager_port}"]
+    ports    = ["22", "443", "${var.shopfront_port}", "${var.productcatalogue_port}", "${var.stockmanager_port}"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["${var.all_locations_cidr}"]
 }
 
 resource "google_compute_http_health_check" "shopfront" {
