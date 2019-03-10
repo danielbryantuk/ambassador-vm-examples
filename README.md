@@ -14,9 +14,9 @@ The following section of the doc will guide you through using Terraform to provi
 *Please note that this example instantiates several GCP resources, which will cost you money if you do not have free credit remaining*
 
 ### Create GCP account
-If you do not already have one, please create a [Google Cloud Platform account](https://cloud.google.com/). Typically a new account comes with an amount of free credit, which will be useful for experimenting with this example. However, if you have used all of your free credit, then this example may cost several dollars to run.
+If you do not already a [Google Cloud Platform account](https://cloud.google.com/), then please create one. Typically a new account comes with a specified amount of free credit, which will be useful for experimenting with this example. However, if you have used all of your free credit, then this example may cost several dollars to run.
 
-### Install the gcloud CLI tool
+### Install the "gcloud" CLI tool
 Install the [GCP gcloud SDK/CLI tool](https://cloud.google.com/sdk/gcloud/) by following the instructions on the GCP website.
 
 If you have already installed the gcloud CLI, please ensure that it is up to date: `$ sudo gcloud components update`
@@ -31,15 +31,15 @@ Install [Terraform](https://www.terraform.io/downloads.html) according to the in
 Clone this repo and run the `terraform init` command to initialise the directory for further use with Terraform.
 
 ```
-git clone git@github.com:danielbryantuk/ambassador-vm-examples.git
-cd ambassador-vm-examples
+$ git clone git@github.com:danielbryantuk/ambassador-vm-examples.git
+$ cd ambassador-vm-examples
 
-terraform init
+$ terraform init
 ```
 
 ### Create SSH Credentials
 
-You will be provisioning the compute instances via Terraform using SSH, and therefore you will require that a valid SSH key pair exists on your local machine. (The private key will be securely added to the instance metadata during the creation, and the public key will be used for authentication when provisioning).
+You will be provisioning the compute instances via Terraform using SSH, and therefore you will require that a valid SSH key pair exists on your local machine. The private key will be securely added to the remote instance metadata during the creation via Terraform, and the public key will be used for authentication when provisioning.
 
 If you do not already have a key pair created for use with GCP, you can follow the instructions within the ["Creating a new SSH key"](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#createsshkeys) section of the GCP docs.
 
@@ -75,15 +75,15 @@ Run the following commands to create the infrastructure via Terraform.
 First run `terraform plan` in order to check everything is configured correctly, and also to get a preview of the infrastructure that will be created.
 
 ```
-terraform plan
+$ terraform plan
 ```
 
 If you see any errors in the output from the above command, please double-check that you have created your GCP account correctly, and also created the `secret-variables.tf` as specified above.
 
-Next, create the infrastructure by running `terraform apply`. You can remove the need to confirm the creation by adding the `-auto-approve` argument.
+Next, create the infrastructure by running `terraform apply`. You can remove the need to confirm the creation by adding the `-auto-approve` flag.
 
 ```
-terraform apply -auto-approve
+$ terraform apply -auto-approve
 ```
 Note: You may occasionally see the following error when provisioning "E: Package 'ca-certificates-java' has no installation candidate", and this can be overcome by running the `terraform apply -auto-approve` again
 
@@ -92,7 +92,7 @@ The creation of the infrastructure may take some time (~5 mins).
 Upon successful execution of the command, you will see output similar to this:
 
 ```
-Apply complete! Resources: 9 added, 0 changed, 2 destroyed.
+Apply complete! Resources: 15 added, 0 changed, 0 destroyed.
 
 Outputs:
 
@@ -138,7 +138,7 @@ NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.59.240.1   <none>        443/TCP   28m
 ```
 
-You can now deploy Ambassador into the cluster using the [Getting Started](https://www.getambassador.io/user-guide/getting-started/) instructructions in the Ambassador docs, or by running the commands below:
+You can now deploy Ambassador into the cluster using the [Getting Started](https://www.getambassador.io/user-guide/getting-started/) instructions in the Ambassador docs, or by running the commands below:
 
 ```
 # Configure RBAC (enabled by default in GKS) for your account
@@ -177,6 +177,8 @@ ambassador-admin   NodePort       10.59.255.240   <none>         8877:30801/TCP 
 kubernetes         ClusterIP      10.59.240.1     <none>         443/TCP          35m
 ```
 
+### Creating Ambassador Mapping to Route to External Services/Load Balancers
+
 You can now add an Ambassador Mapping to the shopfront service you accessed earlier. This will allow you to access the shopfront via the Ambassador external IP and Kubernetes, rather than calling the shopfront load balancer directly.
 
 The required Ambassador configuration was included as part of the Terraform apply output, and can be found in the `shopfront_ambassador_config` variable. Copy and paste this output to a new file named `shopfront.yaml` in the k8s-config directory.
@@ -213,3 +215,11 @@ service/shopfront created
 You can now access the shopfront via the Ambassador IP and mapping specified in the config. e.g. `http://35.222.43.55/shopfront/`
 
 ![Accessing the shopfront via Ambassador running in k8s](images/shopfront_screenshot.jpg)
+
+### Clean Up and Destroy Infrastructure
+
+When you are finished with the tutorial, you can remove all of the infrastructure by using the `terraform destroy` command. You can add the `-force` flag is you want to skip the confirmation.
+
+```
+$ terraform destroy -force
+```
