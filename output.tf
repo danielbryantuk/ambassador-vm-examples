@@ -14,7 +14,6 @@ output "shop_loadbalancer_ip_port" {
 #   value = "${join(" ", google_compute_instance.vm_stockmanager.*.network_interface.0.access_config.0.nat_ip)}"
 # }
 
-
 # output "k8s_master_ip" {
 #   value = "${google_container_cluster.ambassador_demo.endpoint}"
 # }
@@ -22,7 +21,6 @@ output "shop_loadbalancer_ip_port" {
 output "gcloud_get_creds" {
   value = "gcloud container clusters get-credentials ${google_container_cluster.ambassador_demo.name} --project ${var.project_id} --zone ${var.region_zone}"
 }
-
 
 locals {
   shopfront_ambassador_cfg = <<SFAMBCFG

@@ -8,7 +8,7 @@ variable "region_zone" {
 
 variable "all_locations_cidr" {
   description = "Indicates access from/to all network sources/targets"
-  default = "0.0.0.0/0"
+  default     = "0.0.0.0/0"
 }
 
 variable "instance_type" {
@@ -21,22 +21,22 @@ variable "instance_image" {
 
 variable "shopfront_count" {
   description = "Shopfront instance count"
-  default = "1"
+  default     = "1"
 }
 
 variable "productcatalogue_count" {
   description = "Productcatalogue instance count"
-  default = "1"
+  default     = "1"
 }
 
 variable "stockmanager_count" {
   description = "Stockmanager instance count"
-  default = "1"
+  default     = "1"
 }
 
 variable "k8s_node_count" {
   description = "Kubernetes node pool instance count"
-  default = "3"
+  default     = "3"
 }
 
 variable "shopfront_port" {
@@ -73,10 +73,10 @@ variable "install_script_dest_path" {
 
 variable "spring_cfg_filename" {
   description = "Name of the Spring configuration file"
-  default = "application-override.properties"
+  default     = "application-override.properties"
 }
 
 variable "internet_accessible_tag" {
   description = "Used to indicate the instance should be accessible via the web"
-  default = "internet-accessible"
+  default     = "internet-accessible"
 }

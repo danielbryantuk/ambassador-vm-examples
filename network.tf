@@ -1,5 +1,5 @@
 resource "google_compute_network" "shop" {
-  name = "shop"
+  name                    = "shop"
   auto_create_subnetworks = "true"
 }
 
