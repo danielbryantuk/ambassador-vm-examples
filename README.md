@@ -214,7 +214,7 @@ service/shopfront created
 
 You can now access the shopfront via the Ambassador IP and mapping specified in the config. e.g. `http://35.222.43.55/shopfront/`
 
-![Accessing the shopfront via Ambassador running in k8s](images/shopfront_screenshot.jpg)
+![Accessing the shopfront via Ambassador running in k8s](images/shopfront_screenshot_via_ambassador.jpg)
 
 ### Clean Up and Destroy Infrastructure
 
